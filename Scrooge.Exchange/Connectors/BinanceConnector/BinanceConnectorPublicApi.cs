@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Scrooge.Exchange.Connectors.Models;
 
 namespace Scrooge.Exchange.Connectors.BinanceConnector
 {
@@ -17,18 +18,6 @@ namespace Scrooge.Exchange.Connectors.BinanceConnector
         public async Task<IEnumerable<PriceInfo>> TickerAllPrices()
         {
             return await SendRequest<List<PriceInfo>>("ticker/allPrices", ApiVersion.Version1, ApiMethodType.None, HttpMethod.Get);
-        }
-
-
-        public class PriceInfo
-        {
-            public string Symbol { get; set; }
-            public decimal Price { get; set; }
-
-            public override string ToString()
-            {
-                return $"{Symbol}: {Price}";
-            }
         }
     }
 }

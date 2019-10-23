@@ -1,4 +1,5 @@
 ﻿using System;
+using Scrooge.Exchange.Connectors;
 using  Scrooge.Exchange.Connectors.BinanceConnector;
 
 namespace Scrooge.Test
@@ -7,10 +8,13 @@ namespace Scrooge.Test
     {
         static void Main(string[] args)
         {
-            BinanceConnector bc = new BinanceConnector();
+            IConnector bc = new BinanceConnector();
             var pingResult = bc.Ping().Result;
+            
+            var tickerResult = bc.TickerAllPrices().Result;
 
             Console.WriteLine($"Ping result:{pingResult}");
         }
     } 
 }
+
