@@ -1,12 +1,16 @@
 ﻿using System;
+using  Scrooge.Exchange.Connectors.BinanceConnector;
 
-namespace Scrooge
+namespace Scrooge.Test
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            BinanceConnector bc = new BinanceConnector();
+            var pingResult = bc.Ping().Result;
+
+            Console.WriteLine($"Ping result:{pingResult}");
         }
-    }
+    } 
 }
