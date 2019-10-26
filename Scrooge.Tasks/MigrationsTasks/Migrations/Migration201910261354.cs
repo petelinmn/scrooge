@@ -1,10 +1,9 @@
 ﻿using FluentMigrator;
-using FluentMigrator.SqlServer;
 
-namespace Scrooge.Migrations.Migrations
+namespace Scrooge.Task.MigrationsTasks.Migrations
 {
-    [Migration(201910242000)]
-    public class Migration201910242000 : Migration
+    [Migration(201910261354)]
+    public class Migration201910261354 : Migration
     {
         public override void Up()
         {

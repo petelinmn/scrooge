@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Scrooge.Task": {
+      "commandName": "Project",
+      "commandLineArgs": "Migrate par1 par2"
+    }
+  }
+}

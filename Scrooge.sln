@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrooge.Test", "Scrooge.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrooge.Exchange", "Scrooge.Exchange\Scrooge.Exchange.csproj", "{398B408F-434E-41A7-9868-E19F81E629B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrooge.Migrations", "Scrooge.Migrations\Scrooge.Migrations.csproj", "{AAD4110D-8DF1-4621-BD09-0BE0E8FA21BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrooge.Task", "Scrooge.Tasks\Scrooge.Task.csproj", "{AAD4110D-8DF1-4621-BD09-0BE0E8FA21BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
