@@ -1,0 +1,29 @@
+﻿using FluentMigrator;
+
+namespace Scrooge.Task.MigrationsTasks.Migrations
+{
+    [Migration(201911261757)]
+    public class Migration201911261757 : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql(@"
+                CREATE TABLE Markets(
+	                Id serial,
+	                AssetId1 int references Assets(Id),
+	                AssetId2 int references Assets(Id),
+	                Keep boolean,
+	                Work boolean
+                );
+            ");
+        }
+
+        public override void Down()
+        {
+            Execute.Sql(@"
+                drop table Markets;
+            ");
+        }
+    }
+
+}

@@ -8,10 +8,10 @@ namespace Scrooge.Task.MigrationsTasks.Migrations
         public override void Up()
         {
             Execute.Sql(@"
-                insert into Assets values (nextval('AssetsSequence'), 'BTC', true, false);
-                insert into Assets values (nextval('AssetsSequence'), 'USDT', true, true);
-                insert into Assets values (nextval('AssetsSequence'), 'ETH', true, false);                
-                insert into Assets values (nextval('AssetsSequence'), 'BNB', true, false);
+                insert into Assets values (nextval('assets_id_seq'), 'BTC', true, false);
+                insert into Assets values (nextval('assets_id_seq'), 'USDT', true, true);
+                insert into Assets values (nextval('assets_id_seq'), 'ETH', true, false);                
+                insert into Assets values (nextval('assets_id_seq'), 'BNB', true, false);
             ");
         }
 

@@ -9,20 +9,17 @@ namespace Scrooge.Task.MigrationsTasks.Migrations
         {
             Execute.Sql(@"
                 CREATE TABLE Assets(
-	                Id SERIAL,
+	                Id SERIAL PRIMARY KEY,
 	                Name varchar(10),
 	                IsMain boolean,
 	                IsStable boolean
                 );
-
-                CREATE SEQUENCE AssetsSequence start 1 increment 1;
             ");
         }
 
         public override void Down()
         {
             Execute.Sql(@"
-                drop sequence AssetsSequence;
                 drop table Assets;
             ");
         }
