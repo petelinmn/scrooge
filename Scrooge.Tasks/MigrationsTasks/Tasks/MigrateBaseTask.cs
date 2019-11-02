@@ -25,7 +25,7 @@ namespace Scrooge.Task.MigrationsTasks.Tasks
                 {
                     rb.AddPostgres()
                         .WithGlobalConnectionString(connectionString)
-                        .ScanIn(typeof(Migration201910261354).Assembly).For.Migrations();
+                        .ScanIn(typeof(Migration201911261647).Assembly).For.Migrations();
                 })
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .BuildServiceProvider(false);
