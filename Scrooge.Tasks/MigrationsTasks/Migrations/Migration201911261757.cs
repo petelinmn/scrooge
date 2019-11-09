@@ -1,4 +1,5 @@
 ﻿using FluentMigrator;
+using Serilog;
 
 namespace Scrooge.Task.MigrationsTasks.Migrations
 {

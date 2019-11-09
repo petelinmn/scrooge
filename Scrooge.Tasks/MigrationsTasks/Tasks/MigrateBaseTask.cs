@@ -7,19 +7,15 @@ using Scrooge.Task.MigrationsTasks.Migrations;
 
 namespace Scrooge.Task.MigrationsTasks.Tasks
 {
-    public class MigrateBaseTask : TaskBase
+    public abstract class MigrateBaseTask : TaskBase
     {
         protected static IServiceProvider ServiceProvider;
-        public MigrateBaseTask()
-        {
-            ServiceProvider = CreateServices();
-        }
 
-        private IServiceProvider CreateServices()
+        protected override void CreateServices()
         {
             var connectionString = Configuration["ConnectionStrings:Default"];
 
-            return new ServiceCollection()
+            ServiceProvider = new ServiceCollection()
                 .AddFluentMigratorCore()
                 .ConfigureRunner(rb =>
                 {

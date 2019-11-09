@@ -1,4 +1,5 @@
 ﻿using FluentMigrator;
+using Serilog;
 
 namespace Scrooge.Task.MigrationsTasks.Migrations
 {
@@ -14,6 +15,11 @@ namespace Scrooge.Task.MigrationsTasks.Migrations
 	                IsMain boolean,
 	                IsStable boolean
                 );
+
+                insert into Assets values (nextval('assets_id_seq'), 'BTC', true, false);
+                insert into Assets values (nextval('assets_id_seq'), 'USDT', true, true);
+                insert into Assets values (nextval('assets_id_seq'), 'ETH', true, false);                
+                insert into Assets values (nextval('assets_id_seq'), 'BNB', true, false);
             ");
         }
 

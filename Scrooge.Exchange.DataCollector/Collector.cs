@@ -1,24 +1,24 @@
-﻿using System;
+﻿
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scrooge.Infrastructure.Installers;
 using Serilog;
 using Serilog.Core;
-
 using Serilog.Events;
 using TelegramSink;
 
-namespace Scrooge.Task
+namespace Scrooge.Exchange.DataCollector
 {
-    public abstract class TaskBase : IDisposable
+    public abstract class BaseCollector : IDisposable
     {
-        protected TaskBase()
+        protected BaseCollector()
         {
             CreateAndRunApplication();
         }
-
-        protected void CreateAndRunApplication()
+        
+        private void CreateAndRunApplication()
         {
             CreateContainer();
             CreateLogger();
@@ -26,7 +26,7 @@ namespace Scrooge.Task
 
             Execute();
         }
-        
+
         private void CreateContainer()
         {
             Configuration = new ConfigurationBuilder()
@@ -35,8 +35,9 @@ namespace Scrooge.Task
                 .Build();
 
             var services = new ServiceCollection();
+
             services.AddSingleton(Configuration);
-            services.AddTasksDependencies();
+            services.AddCollectorsDependencies();
 
             Container = services.BuildServiceProvider();
         }
@@ -58,13 +59,16 @@ namespace Scrooge.Task
             Log = logConfiguration.CreateLogger();
         }
 
-        protected abstract void Execute();
-        protected abstract void CreateServices();
+        public abstract void Execute();
 
-        protected IConfiguration Configuration { get; private set; }
+        protected void CreateServices()
+        {
+
+        }
+
         protected ServiceProvider Container { get; private set; }
-        protected Logger Log { get; private set; }
-
+        protected Logger Log { get; set; }
+        protected IConfiguration Configuration { get; private set; }
         public void Dispose()
         {
             Configuration = null;

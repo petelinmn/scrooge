@@ -18,11 +18,7 @@ namespace Scrooge.Task
                     && type.GetCustomAttribute<ObsoleteAttribute>() == null
                     && type.Name == $"{args[0]}Task");
 
-            var taskArgs = args.ToList();
-            taskArgs.RemoveAt(0);
-
             using var task = (TaskBase)Activator.CreateInstance(taskType);
-            task.Execute(taskArgs.ToArray());
         }
     }
 }

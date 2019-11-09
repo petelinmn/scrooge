@@ -1,6 +1,7 @@
 ﻿using System;
 using Scrooge.Exchange.Connectors;
-using  Scrooge.Exchange.Connectors.BinanceConnector;
+using Scrooge.Exchange.Connectors.BinanceConnector;
+using System.Net;
 
 namespace Scrooge.Test
 {
@@ -8,6 +9,9 @@ namespace Scrooge.Test
     {
         static void Main(string[] args)
         {
+            var wb = new WebClient();
+            string response = wb.DownloadString("https://api.telegram.org/bot973935382:AAHlCvrGDVXF2VkwQe1vszxKj4eN07ZEKxk/getUpdates");
+
             IConnector bc = new BinanceConnector();
             var pingResult = bc.Ping().Result;
             
