@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Scrooge.Exchange\Scrooge.Exchange.csproj" />
+    <ProjectReference Include="..\Scrooge.Exchange\Scrooge.Exchange.Connectors.csproj" />
   </ItemGroup>
 
 </Project>

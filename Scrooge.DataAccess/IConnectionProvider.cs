@@ -9,5 +9,7 @@ namespace Scrooge.DataAccess
         IDbTransaction OpenTransaction();
         IDbConnection CurrentConnection { get; }
         IDbTransaction CurrentTransaction { get; }
+        IDbTransaction SetTransaction(IDbTransaction transaction);
+        IDbConnection SetConnection(IDbConnection connection);
     }
 }

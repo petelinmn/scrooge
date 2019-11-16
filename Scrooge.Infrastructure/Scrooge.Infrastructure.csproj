@@ -10,6 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Scrooge.BusinessLogic.Implement\Scrooge.BusinessLogic.Implement.csproj" />
+    <ProjectReference Include="..\Scrooge.BusinessLogic\Scrooge.BusinessLogic.csproj" />
     <ProjectReference Include="..\Scrooge.DataAccess.Repository\Scrooge.DataAccess.Repository.csproj" />
     <ProjectReference Include="..\Scrooge.DataAccess\Scrooge.DataAccess.csproj" />
   </ItemGroup>

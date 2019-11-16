@@ -53,6 +53,18 @@ namespace Scrooge.DataAccess.Repository
             }
         }
 
+        public IDbTransaction SetTransaction(IDbTransaction transaction)
+        {
+            _transaction = transaction;
+            return _transaction;
+        }
+
+        public IDbConnection SetConnection(IDbConnection connection)
+        {
+            _connection = connection;
+            return _connection;
+        }
+
         public void Dispose()
         {
             Dispose(true);

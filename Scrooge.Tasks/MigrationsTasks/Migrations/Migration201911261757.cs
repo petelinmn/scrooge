@@ -12,9 +12,7 @@ namespace Scrooge.Task.MigrationsTasks.Migrations
                 CREATE TABLE Markets(
 	                Id serial,
 	                AssetId1 int references Assets(Id),
-	                AssetId2 int references Assets(Id),
-	                Keep boolean,
-	                Work boolean
+	                AssetId2 int references Assets(Id)
                 );
             ");
         }

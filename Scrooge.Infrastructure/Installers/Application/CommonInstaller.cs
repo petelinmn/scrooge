@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Scrooge.DataAccess;
+using Scrooge.DataAccess.Util;
+using Scrooge.DataAccess.Repository.Util;
 using Scrooge.DataAccess.Repository;
 using Scrooge.Infrastructure.Configuration;
 
@@ -14,6 +13,7 @@ namespace Scrooge.Infrastructure.Installers.Application
         {
             services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
             services.AddScoped<IConnectionProvider, ConnectionProvider>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
 }

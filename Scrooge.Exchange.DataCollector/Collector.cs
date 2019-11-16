@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Scrooge.DataAccess.Util;
 using Scrooge.Infrastructure.Installers;
 using Serilog;
 using Serilog.Core;
@@ -40,6 +41,13 @@ namespace Scrooge.Exchange.DataCollector
             services.AddCollectorsDependencies();
 
             Container = services.BuildServiceProvider();
+        }
+
+        protected IUnitOfWork GetUnitOfWork()
+        {
+            IUnitOfWork unitOfWork = Container.GetService<IUnitOfWork>();
+            unitOfWork.Begin();
+            return unitOfWork;
         }
 
         private void CreateLogger()

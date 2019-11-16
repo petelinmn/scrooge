@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Serilog;
+﻿using Scrooge.BusinessLogic.Collector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Scrooge.Exchange.DataCollector
 {
@@ -9,7 +7,13 @@ namespace Scrooge.Exchange.DataCollector
     {
         public override void Execute()
         {
-              Log.Information("Executing successful");
+            Log.Information("Executing successful");
+            var service = Container.GetService<IDataCollectorService>();
+            using (var uow = GetUnitOfWork())
+            {
+                service.MarketDefinition();
+                uow.Commit();
+            }
         }
     }
 }
