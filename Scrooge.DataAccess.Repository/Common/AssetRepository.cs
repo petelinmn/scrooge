@@ -12,7 +12,7 @@ namespace Scrooge.DataAccess.Repository.Common
     public class AssetRepository : BaseRepository, IAssetRepository
     {
 
-        public IEnumerable<Asset> GetAssets()
+        public List<Asset> GetAssets()
         {
             var result = Connection.Query<Asset>($@"
                     select Id, Name, IsMain, IsStable from public.Assets
@@ -23,7 +23,7 @@ namespace Scrooge.DataAccess.Repository.Common
         }
 
 
-        public IEnumerable<Market> GetMarkets()
+        public List<Market> GetMarkets()
         {
             var result = Connection.Query<Market>($@"
                     select m.Id, concat(a1.Name, a2.Name) as Name, m.AssetId1, m.AssetId2 

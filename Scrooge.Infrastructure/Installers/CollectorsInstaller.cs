@@ -5,6 +5,8 @@ using Scrooge.DataAccess;
 using Scrooge.DataAccess.Common;
 using Scrooge.DataAccess.Repository;
 using Scrooge.DataAccess.Repository.Common;
+using Scrooge.Exchange.Connectors;
+using Scrooge.Exchange.Connectors.BinanceConnector;
 using Scrooge.Infrastructure.Installers.Application;
 
 namespace Scrooge.Infrastructure.Installers
@@ -18,6 +20,8 @@ namespace Scrooge.Infrastructure.Installers
             services.AddScoped<IDataCollectorService, DataCollectorService>();
 
             services.AddScoped<IAssetRepository, AssetRepository>();
+
+            services.AddScoped<IConnector, BinanceConnector>();
         }
     }
 }

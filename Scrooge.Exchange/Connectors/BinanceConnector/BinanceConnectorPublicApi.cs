@@ -15,9 +15,9 @@ namespace Scrooge.Exchange.Connectors.BinanceConnector
             return response.Type == JTokenType.Object;
         }
 
-        public async Task<IEnumerable<PriceInfo>> TickerAllPrices()
+        public async Task<IList<PriceInfo>> TickerAllPrices()
         {
-            return await SendRequest<List<PriceInfo>>("ticker/allPrices", ApiVersion.Version1, ApiMethodType.None, HttpMethod.Get);
+            return await SendRequest<IList<PriceInfo>>("ticker/allPrices", ApiVersion.Version1, ApiMethodType.None, HttpMethod.Get);
         }
     }
 }

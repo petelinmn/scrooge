@@ -11,13 +11,13 @@ namespace Scrooge.DataAccess.Common
         /// Get all assets
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Asset> GetAssets();
+        List<Asset> GetAssets();
 
         /// <summary>
         /// Get list of markets
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Market> GetMarkets();
+        List<Market> GetMarkets();
 
         /// <summary>
         /// Save list of assets

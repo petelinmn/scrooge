@@ -1,4 +1,6 @@
-﻿using Scrooge.BusinessLogic.Collector;
+﻿using System;
+using System.Threading.Tasks;
+using Scrooge.BusinessLogic.Collector;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Scrooge.Exchange.DataCollector
@@ -7,12 +9,15 @@ namespace Scrooge.Exchange.DataCollector
     {
         public override void Execute()
         {
-            Log.Information("Executing successful");
             var service = Container.GetService<IDataCollectorService>();
             using (var uow = GetUnitOfWork())
             {
-                service.MarketDefinition();
+                var isAddedNewMarkets = service.MarketCollectionInitialize().Result;
+
                 uow.Commit();
+
+                if (isAddedNewMarkets)
+                    Log.Information("List of markets was updated");
             }
         }
     }

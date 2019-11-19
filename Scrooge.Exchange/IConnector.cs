@@ -8,6 +8,6 @@ namespace Scrooge.Exchange.Connectors
     {
         Task<bool> Ping();
 
-        Task<IEnumerable<PriceInfo>> TickerAllPrices();
+        Task<IList<PriceInfo>> TickerAllPrices();
     }
 }
