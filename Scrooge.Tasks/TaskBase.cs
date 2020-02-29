@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Scrooge.DataAccess.Util;
 using Scrooge.Infrastructure.Installers;
 using Serilog;
 using Serilog.Core;
@@ -58,8 +59,17 @@ namespace Scrooge.Task
             Log = logConfiguration.CreateLogger();
         }
 
+        protected IUnitOfWork GetUnitOfWork()
+        {
+            IUnitOfWork unitOfWork = Container.GetService<IUnitOfWork>();
+            unitOfWork.Begin();
+            return unitOfWork;
+        }
+        protected virtual void CreateServices()
+        {
+
+        }
         protected abstract void Execute();
-        protected abstract void CreateServices();
 
         protected IConfiguration Configuration { get; private set; }
         protected ServiceProvider Container { get; private set; }

@@ -28,7 +28,7 @@ namespace Scrooge.Exchange.Connectors.BinanceConnector
             ApiKey = 1,
             Signed = 2
         }
-
+        
         protected delegate T ResponseParseHandler<T>(string input);
 
         protected async Task<T> SendRequest<T>(string methodName, string version, ApiMethodType apiMethod, HttpMethod httpMethod,

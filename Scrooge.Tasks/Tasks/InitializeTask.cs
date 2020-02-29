@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Scrooge.BusinessLogic.Common;
 
-namespace Scrooge.Exchange.DataCollector
+namespace Scrooge.Task.Tasks
 {
-    public class BinanceCollector : BaseCollector
+    class InitializeTask : TaskBase
     {
-        public override void Execute()
+        protected override void Execute()
         {
             var service = Container.GetService<IDataCommonService>();
             using (var uow = GetUnitOfWork())

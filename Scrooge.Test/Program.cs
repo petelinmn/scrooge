@@ -10,7 +10,7 @@ namespace Scrooge.Test
         static void Main(string[] args)
         {
             IConnector bc = new BinanceConnector();
-            var pingResult = bc.Ping().Result;
+            var pingResult = bc.TickerAllPrices().Result;
             
 
             var tickerResult = bc.TickerAllPrices().Result;
