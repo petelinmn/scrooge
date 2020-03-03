@@ -25,8 +25,6 @@ namespace Scrooge.BusinessLogic.Implement.Common
 
             var assetMarketMap = GetAssetMarketMap(allAssets, tickerResult);
 
-            var unionAssetMarketMap = UnionGetAssetMarketMap(allAssets, tickerResult);
-
             return false;
         }
 
@@ -38,52 +36,22 @@ namespace Scrooge.BusinessLogic.Implement.Common
         /// <returns></returns>
         private static Dictionary<Asset, List<string>> GetAssetMarketMap(IEnumerable<Asset> assets, IList<PriceInfo> tickerResult)
         {
-            var primaryAssets = assets.Where(i => i.IsMain);
-            
-            var assetMarketMap = new Dictionary<Asset, List<string>>();
-            foreach (var asset in primaryAssets)
+            var primaryAssets = assets.ToDictionary(i=>i, i=>tickerResult.Where(t=>t.Symbol.EndsWith(i.Name)).Select(s => s.Symbol).ToList());
+            Dictionary<string, int> text = new Dictionary<string, int>();
+            foreach (var primAss in primaryAssets)
             {
-                var assetMarkets = tickerResult.ToList().Where(i => i.Symbol.EndsWith(asset.Name)).Select(i => i.Symbol).OrderBy(i => i).ToList();
-                assetMarketMap.Add(asset, assetMarkets);
-            }
-
-            return assetMarketMap;
-        }
-        private static Dictionary<Asset, List<string>> UnionGetAssetMarketMap(IEnumerable<Asset> assets, IList<PriceInfo> tickerResult)
-        {
-            var unionAssetMarketMap = new Dictionary<Asset, List<string>>();
-            var unionNames = new List<string>();
-            
-            foreach (var asset in assets)
-            {
-                var assetMarkets = tickerResult.ToList().Where(i => i.Symbol.EndsWith(asset.Name)).Select(i => i.Symbol).OrderBy(i => i).ToList();
-                foreach (var name in assetMarkets)
+                foreach (var primAssValue in primAss.Value)
                 {
-                    var unionName = name.Replace(asset.Name, "");
-                    unionNames.Add(unionName);
-                }                
-            }
-            Dictionary <string, int> text = new Dictionary<string, int>();
-            foreach (var str in unionNames)
-            {
-                if (text.ContainsKey(str))
-                    text[str]++;
-                else
-                    text.Add(str, 1);
-            }  
-            var fourValue = text.Where(i => i.Value == assets.Count()).ToList();
-
-            foreach (var asset in assets)
-            {
-                var unionN = new List<string>();
-                foreach (var four in fourValue)
-                {
-                    var assetMarkets = tickerResult.ToList().Where(i => i.Symbol.EndsWith(asset.Name) && i.Symbol.StartsWith(four.Key)).Select(i => i.Symbol).OrderBy(i => i).ToList();
-                    unionN.AddRange(assetMarkets);
+                    var str = primAssValue.Replace(primAss.Key.Name, " ");
+                    if (text.ContainsKey(str))
+                        text[str]++;
+                    else
+                        text.Add(str, 1);
                 }
-                unionAssetMarketMap.Add(asset, unionN);
-            }            
-            return unionAssetMarketMap;
+            }
+            var fourValue = text.Where(i => i.Value == assets.Count()).ToList();
+            var assetMarketMap = assets.ToDictionary(i => i, i => tickerResult.Where(t => fourValue.Any(f=>f.Key + i.Name == t.Symbol)).Select(s => s.Symbol).ToList());
+            return assetMarketMap;
         }
 
         /// <summary>
