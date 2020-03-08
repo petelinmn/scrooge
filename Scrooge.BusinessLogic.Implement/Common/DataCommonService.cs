@@ -23,37 +23,61 @@ namespace Scrooge.BusinessLogic.Implement.Common
 
             var allAssets = _assetRepository.GetAssets();
 
-            var assetMarketMap = GetAssetMarketMap(allAssets, tickerResult);
+            var newAssets = GetNewAsset(allAssets, tickerResult);
+
+            _assetRepository.Save(newAssets);
+
+            var allMarkets = _assetRepository.GetMarkets();
+
+            var newMarket = GetNewMarkets(allAssets, tickerResult);
+
+            _assetRepository.Save(newMarket);
+
+
 
             return false;
         }
 
-        /// <summary>
+        /// <summary> 
         /// Get mapping dictionary for asset and collection its markets
         /// </summary>
         /// <param name="assets"></param>
         /// <param name="tickerResult"></param>
         /// <returns></returns>
-        private static Dictionary<Asset, List<string>> GetAssetMarketMap(IEnumerable<Asset> assets, IList<PriceInfo> tickerResult)
+        private static List<Asset> GetNewAsset(IEnumerable<Asset> assets, IList<PriceInfo> tickerResult)
         {
-            var primaryAssets = assets.ToDictionary(i=>i, i=>tickerResult.Where(t=>t.Symbol.EndsWith(i.Name)).Select(s => s.Symbol).ToList());
+            var primaryAssets = assets.Where(i => i.IsMain == true).ToDictionary(i => i, i => tickerResult.Where(t => t.Symbol.EndsWith(i.Name)).Select(s => s.Symbol).ToList());
             Dictionary<string, int> text = new Dictionary<string, int>();
             foreach (var primAss in primaryAssets)
             {
                 foreach (var primAssValue in primAss.Value)
                 {
-                    var str = primAssValue.Replace(primAss.Key.Name, " ");
+                    var str = primAssValue.Replace(primAss.Key.Name, "");
+
                     if (text.ContainsKey(str))
                         text[str]++;
                     else
                         text.Add(str, 1);
                 }
             }
-            var fourValue = text.Where(i => i.Value == assets.Count()).ToList();
-            var assetMarketMap = assets.ToDictionary(i => i, i => tickerResult.Where(t => fourValue.Any(f=>f.Key + i.Name == t.Symbol)).Select(s => s.Symbol).ToList());
-            return assetMarketMap;
+            return  text.Where(i => !assets.Any(a => a.Name == i.Key)).Where(i => i.Value == assets.Count()).Select(i => new Asset() { Name = i.Key, IsMain = false, IsStable = false }).ToList();
         }
 
+        private static List<Market> GetNewMarkets (IEnumerable<Asset> assets, IList<PriceInfo> tickerResult)
+        {
+            List<Market> newMarkets = new List<Market>();
+           foreach (var a in assets)
+            {
+                foreach (var a_2 in assets)
+                {
+                    if (tickerResult.Any(i => i.Symbol == a_2.Name + a.Name))
+                    {
+                        newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a_2.Id });
+                    }
+                }               
+            }
+            return newMarkets.Distinct().ToList();
+        }
         /// <summary>
         /// Return second asset from market
         /// </summary>
