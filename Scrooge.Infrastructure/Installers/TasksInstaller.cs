@@ -16,6 +16,7 @@ namespace Scrooge.Infrastructure.Installers
             services.AddDataAccessCommon();
             services.AddScoped<IDataCommonService, DataCommonService>();
             services.AddScoped<IAssetRepository, AssetRepository>();
+            services.AddScoped<IMarketRepository, MarketRepository>();
             services.AddScoped<IConnector, BinanceConnector>();
         }
     }

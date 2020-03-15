@@ -12,5 +12,6 @@ namespace Scrooge.BusinessLogic.Common
         /// </summary>
         /// <returns></returns>
         Task<bool> MarketCollectionInitialize();
+        Task<bool> Collect();
     }
 }

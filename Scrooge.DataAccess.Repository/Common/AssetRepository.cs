@@ -23,9 +23,9 @@ namespace Scrooge.DataAccess.Repository.Common
         }
 
 
-        public List<Market> GetMarkets()
+        public List<Price> GetPrices()
         {
-            var result = Connection.Query<Market>($@"
+            var result = Connection.Query<Price>($@"
                     select m.Id, concat(a1.Name, a2.Name) as Name, m.AssetId1, m.AssetId2 
                         from public.markets m 
                             join public.assets a1 on a1.Id = m.AssetId1
@@ -35,7 +35,7 @@ namespace Scrooge.DataAccess.Repository.Common
                 transaction: Transaction);
             return result.ToList();
         }
-        
+
         public void Save(List<Asset> assets)
         {
             foreach (var asset in assets)
@@ -46,13 +46,14 @@ namespace Scrooge.DataAccess.Repository.Common
             }
         }
 
-        public void Save(List<Market> markets)
+
+        public void Save(List<Price> prices)
         {
-            foreach (var market in markets)
+            foreach (var price in prices)
             {
                 Connection.Execute($@"
-                    insert into Markets values (nextval('markets_id_seq'),@{nameof(market.AssetId1)},@{nameof(market.AssetId2)})",
-                    new { market.AssetId1, market.AssetId2 }, Transaction);
+                    insert into Prices values (nextval('prices_id_seq'),@{nameof(price.MarketId)},@{nameof(price.Value)},@{nameof(price.Date)})",
+                    new { price.MarketId, price.Value, price.Date }, Transaction);
             }
         }
 

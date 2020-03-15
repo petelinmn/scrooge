@@ -13,6 +13,31 @@ namespace Scrooge.BusinessLogic.Implement.Common
 {
     public class DataCommonService : IDataCommonService
     {
+        public async Task<bool> Collect()
+        {
+            var tickerResult = await _binanceConnector.TickerAllPrices();
+            var allMarket = _marketRepository.GetMarkets();
+            var generatedPrice = GetNewPrice(tickerResult, allMarket);
+            return false;
+        }
+
+        private static List<Price> GetNewPrice (IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket)
+        {
+            List<Price> newPrice = new List<Price>();
+            // Пробовал сделать по крутому. не вышло. Сделал форичами за 3 минуты.
+            //var newPrice_2 = tickerResult.Where(i => allMarket.Any(a => a.Name == i.Symbol)).Select(s => new Price() { MarketId = Convert.ToInt32(allMarket.Where(m => m.Name == s.Symbol).Select(s_2 =>s_2.Id)), Value = s.Price, Date = DateTime.Now }).ToList();
+            foreach (var a in allMarket)
+            {
+                foreach (var t in tickerResult)
+                {
+                    if (a.Name == t.Symbol)
+                    {
+                        newPrice.Add(new Price() { MarketId = a.Id, Value = t.Price, Date = DateTime.Now });
+                    }
+                }
+            }
+            return newPrice;
+        }
         /// <summary>
         /// First initialize collections of assets and markets
         /// </summary>
@@ -27,9 +52,9 @@ namespace Scrooge.BusinessLogic.Implement.Common
             _assetRepository.Save(newAssets);
 
             allAssets = _assetRepository.GetAssets();
-            var allMarkets = _assetRepository.GetMarkets();
+            var allMarkets = _marketRepository.GetMarkets();
             var newMarkets = DefineNewMarkets(allAssets, allMarkets, allSymbols);
-            _assetRepository.Save(newMarkets);
+            _marketRepository.Save(newMarkets);
 
             return false;
         }
@@ -69,19 +94,21 @@ namespace Scrooge.BusinessLogic.Implement.Common
            List<Market> newMarkets = new List<Market>();
            foreach (var a in assets)
                 foreach (var a2 in assets)
-                    if (allSymbols.Any(i => i == a2.Name + a.Name) && !markets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id))
-                        newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a2.Id });
+                    if (allSymbols.Any(i => i == a.Name + a2.Name) && !markets.Any(i => i.AssetId1 == a2.Id && i.AssetId2 == a.Id))
+                        newMarkets.Add(new Market() { AssetId1 = a2.Id, AssetId2 = a.Id });
 
             return newMarkets;
         }
 
-        public DataCommonService(IAssetRepository assetRepository, IConnector binanceConnector)
+        public DataCommonService(IAssetRepository assetRepository, IMarketRepository marketRepository, IConnector binanceConnector)
         {
             _assetRepository = assetRepository;
+            _marketRepository = marketRepository;
             _binanceConnector = binanceConnector;
         }
 
         private readonly IAssetRepository _assetRepository;
         private readonly IConnector _binanceConnector;
+        private readonly IMarketRepository _marketRepository;
     }
 }

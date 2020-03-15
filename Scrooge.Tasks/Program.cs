@@ -16,7 +16,7 @@ namespace Scrooge.Task
                     typeof(TaskBase).IsAssignableFrom(type)
                     && !type.IsAbstract
                     && type.GetCustomAttribute<ObsoleteAttribute>() == null
-                    && type.Name == $"{args[0]}Task");
+                    && type.Name.ToLower() == $"{args[0].ToLower()}task");
 
             using var task = (TaskBase)Activator.CreateInstance(taskType);
         }

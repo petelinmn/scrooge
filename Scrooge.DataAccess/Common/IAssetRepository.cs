@@ -14,21 +14,9 @@ namespace Scrooge.DataAccess.Common
         List<Asset> GetAssets();
 
         /// <summary>
-        /// Get list of markets
-        /// </summary>
-        /// <returns></returns>
-        List<Market> GetMarkets();
-
-        /// <summary>
         /// Save list of assets
         /// </summary>
         /// <param name="assets"></param>
         void Save(List<Asset> assets);
-
-        /// <summary>
-        /// Save list of markets
-        /// </summary>
-        /// <param name="assets"></param>
-        void Save(List<Market> markets);
     }
 }
