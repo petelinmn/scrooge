@@ -15,28 +15,21 @@ namespace Scrooge.BusinessLogic.Implement.Common
     {
         public async Task<bool> Collect()
         {
-            var tickerResult = await _binanceConnector.TickerAllPrices();
             var allMarket = _marketRepository.GetMarkets();
-            var generatedPrice = GetNewPrice(tickerResult, allMarket);
+            var requestDate = DateTime.Now;
+            var tickerResult = await _binanceConnector.TickerAllPrices();
+            var generatedPrice = GetNewPrice(tickerResult, allMarket, requestDate);
             return false;
         }
 
-        private static List<Price> GetNewPrice (IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket)
+        private static List<Price> GetNewPrice (IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket, DateTime requestDate)
         {
-            List<Price> newPrice = new List<Price>();
-            // Пробовал сделать по крутому. не вышло. Сделал форичами за 3 минуты.
-            //var newPrice_2 = tickerResult.Where(i => allMarket.Any(a => a.Name == i.Symbol)).Select(s => new Price() { MarketId = Convert.ToInt32(allMarket.Where(m => m.Name == s.Symbol).Select(s_2 =>s_2.Id)), Value = s.Price, Date = DateTime.Now }).ToList();
+            List<Price> result = new List<Price>();
             foreach (var a in allMarket)
-            {
                 foreach (var t in tickerResult)
-                {
                     if (a.Name == t.Symbol)
-                    {
-                        newPrice.Add(new Price() { MarketId = a.Id, Value = t.Price, Date = DateTime.Now });
-                    }
-                }
-            }
-            return newPrice;
+                        result.Add(new Price() { MarketId = a.Id, Value = t.Price, Date = requestDate });
+            return result;
         }
         /// <summary>
         /// First initialize collections of assets and markets
@@ -89,13 +82,15 @@ namespace Scrooge.BusinessLogic.Implement.Common
         /// <param name="assets"></param>
         /// <param name="allSymbols"></param>
         /// <returns></returns>
-        private static List<Market> DefineNewMarkets (IEnumerable<Asset> assets, IEnumerable<Market> markets, IEnumerable<string> allSymbols)
+        private static List<Market> DefineNewMarkets (IEnumerable<Asset> assets, IEnumerable<Market> allMarkets, IEnumerable<string> allSymbols)
         {
            List<Market> newMarkets = new List<Market>();
            foreach (var a in assets)
-                foreach (var a2 in assets)
-                    if (allSymbols.Any(i => i == a.Name + a2.Name) && !markets.Any(i => i.AssetId1 == a2.Id && i.AssetId2 == a.Id))
-                        newMarkets.Add(new Market() { AssetId1 = a2.Id, AssetId2 = a.Id });
+                foreach (var a2 in assets.Where(i => i.IsMain || (!i.IsMain && !a.IsMain)))
+                    if (allSymbols.Any(i => i == a.Name + a2.Name) && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id)
+                        && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id) 
+                        && !newMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id))
+                        newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a2.Id });
 
             return newMarkets;
         }
