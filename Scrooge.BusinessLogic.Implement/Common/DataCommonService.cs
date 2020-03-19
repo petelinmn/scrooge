@@ -19,6 +19,7 @@ namespace Scrooge.BusinessLogic.Implement.Common
             var requestDate = DateTime.Now;
             var tickerResult = await _binanceConnector.TickerAllPrices();
             var generatedPrice = GetNewPrice(tickerResult, allMarket, requestDate);
+            _priceRepository.Save(generatedPrice);
             return false;
         }
 
@@ -95,15 +96,18 @@ namespace Scrooge.BusinessLogic.Implement.Common
             return newMarkets;
         }
 
-        public DataCommonService(IAssetRepository assetRepository, IMarketRepository marketRepository, IConnector binanceConnector)
+        public DataCommonService(IAssetRepository assetRepository, IMarketRepository marketRepository, IPriceRepository priceRepository, IConnector binanceConnector)
         {
             _assetRepository = assetRepository;
             _marketRepository = marketRepository;
+            _priceRepository = priceRepository;
             _binanceConnector = binanceConnector;
         }
 
         private readonly IAssetRepository _assetRepository;
         private readonly IConnector _binanceConnector;
         private readonly IMarketRepository _marketRepository;
+        private readonly IPriceRepository _priceRepository;
+
     }
 }

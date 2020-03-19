@@ -14,7 +14,7 @@ namespace Scrooge.DataAccess.Repository.Common
         public List<Market> GetMarkets()
         {
             var result = Connection.Query<Market>($@"
-                    select m.Id, concat(a1.Name, a2.Name) as Name, m.AssetId1, m.AssetId2 
+                    select m.Id, concat(a2.Name, a1.Name) as Name, m.AssetId1, m.AssetId2 
                         from public.markets m 
                             join public.assets a1 on a1.Id = m.AssetId1
                             join public.assets a2 on a2.Id = m.AssetId2

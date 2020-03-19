@@ -7,6 +7,9 @@ namespace Scrooge.DataAccess.Common
 {
     public interface IPriceRepository
     {
+        
+        List<Price> GetPrices();
 
+        void Save(List<Price> prices);
     }
 }

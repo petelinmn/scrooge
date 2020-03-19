@@ -9,18 +9,21 @@ namespace Scrooge.Task.Tasks
         protected override void Execute()
         {
             var service = Container.GetService<IDataCommonService>();
-            while (true)
+            using (var uow = GetUnitOfWork())
+            
             {
-                using (var uow = GetUnitOfWork())
+                while (true)
                 {
+                    uow.Begin();
                     var isAddedNewMarkets = service.Collect().Result;
 
                     uow.Commit();
 
                     if (isAddedNewMarkets)
                         Log.Information("List of markets was updated");
+                    Thread.Sleep(5000);
                 }
-                Thread.Sleep(5000);
+                
             }
         }
     }
