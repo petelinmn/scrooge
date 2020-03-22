@@ -23,6 +23,18 @@ namespace Scrooge.DataAccess.Repository.Common
                 transaction: Transaction);
             return result.ToList();
         }
+        public List<Price> GetLastPrices()
+        {
+            var result = Connection.Query<Price>($@"
+                    SELECT id, marketid, date, value
+	                    FROM public.prices Where id in
+                             (SELECT Max(id) FROM public.prices
+                             group by marketid)
+                ",
+                new { },
+                transaction: Transaction);
+            return result.ToList();
+        }
 
         public void Save(List<Price> prices)
         {

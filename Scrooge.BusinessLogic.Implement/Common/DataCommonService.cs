@@ -18,12 +18,14 @@ namespace Scrooge.BusinessLogic.Implement.Common
             var allMarket = _marketRepository.GetMarkets();
             var requestDate = DateTime.Now;
             var tickerResult = await _binanceConnector.TickerAllPrices();
-            var generatedPrice = GetNewPrice(tickerResult, allMarket, requestDate);
-            _priceRepository.Save(generatedPrice);
+            var generatedPrice = GeneratedPrice(tickerResult, allMarket, requestDate);
+            var lastPrices = _priceRepository.GetLastPrices();
+            var newPrices = GetNewPrice(generatedPrice, lastPrices);
+            _priceRepository.Save(newPrices);
             return false;
         }
 
-        private static List<Price> GetNewPrice (IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket, DateTime requestDate)
+        private static List<Price> GeneratedPrice(IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket, DateTime requestDate)
         {
             List<Price> result = new List<Price>();
             foreach (var a in allMarket)
@@ -31,6 +33,15 @@ namespace Scrooge.BusinessLogic.Implement.Common
                     if (a.Name == t.Symbol)
                         result.Add(new Price() { MarketId = a.Id, Value = t.Price, Date = requestDate });
             return result;
+        }
+
+        private static List<Price> GetNewPrice(List<Price> generatedPrice, List<Price> lastPrices)
+        {
+
+            return generatedPrice
+                .Where(i => (lastPrices
+                .Any(l => l.MarketId == i.MarketId && l.Value != i.Value)
+                ||(lastPrices.All(l=>l.MarketId!=i.MarketId)))).ToList();
         }
         /// <summary>
         /// First initialize collections of assets and markets

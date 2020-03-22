@@ -10,6 +10,8 @@ namespace Scrooge.DataAccess.Common
         
         List<Price> GetPrices();
 
+        List<Price> GetLastPrices();
+
         void Save(List<Price> prices);
     }
 }
