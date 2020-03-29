@@ -11,13 +11,14 @@ namespace Scrooge.DataAccess.Repository.Common
 {
     public class MarketRepository : BaseRepository, IMarketRepository
     {
-        public List<Market> GetMarkets()
+        public List<Market> GetMarkets(bool onlyActive = true)
         {
             var result = Connection.Query<Market>($@"
-                    select m.Id, concat(a2.Name, a1.Name) as Name, m.AssetId1, m.AssetId2 
+                    select m.Id, concat(a2.Name, a1.Name) as Name, m.AssetId1, m.AssetId2, m.isactive 
                         from public.markets m 
                             join public.assets a1 on a1.Id = m.AssetId1
                             join public.assets a2 on a2.Id = m.AssetId2
+                        {(onlyActive ? "Where m.isactive = true" : "")}                        
                 ",
                 new { },
                 transaction: Transaction);
@@ -28,7 +29,7 @@ namespace Scrooge.DataAccess.Repository.Common
         {
             var markets = GetMarkets();
             var assets = _assetRepository.GetAssets();
-            var result = markets.Select(i => new MarketInfo { Id = i.Id, Asset1 = assets.First(a => a.Id == i.AssetId1), Asset2 = assets.First(a => a.Id == i.AssetId1)});
+            var result = markets.Select(i => new MarketInfo { Id = i.Id, Asset1 = assets.First(a => a.Id == i.AssetId1), Asset2 = assets.First(a => a.Id == i.AssetId1), IsActive = i.IsActive});
             return result.ToList();
         }
 
@@ -37,8 +38,8 @@ namespace Scrooge.DataAccess.Repository.Common
             foreach (var market in markets)
             {
                 Connection.Execute($@"
-                    insert into Markets values (nextval('markets_id_seq'),@{nameof(market.AssetId1)},@{nameof(market.AssetId2)})",
-                    new { market.AssetId1, market.AssetId2 }, Transaction);
+                    insert into Markets values (nextval('markets_id_seq'),@{nameof(market.AssetId1)},@{nameof(market.AssetId2)},@{nameof(market.IsActive)})",
+                    new { market.AssetId1, market.AssetId2, market.IsActive }, Transaction);
             }
         }
 

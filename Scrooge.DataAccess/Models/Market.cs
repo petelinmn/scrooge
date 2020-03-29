@@ -10,6 +10,7 @@ namespace Scrooge.DataAccess.Models
         public string Name { get; set; }
         public int AssetId1 { get; set; }
         public int AssetId2 { get; set; }
+        public bool IsActive { get; set; }
     }
 
     public class Price

@@ -15,7 +15,7 @@ namespace Scrooge.BusinessLogic.Implement.Common
     {
         public async Task<bool> Collect()
         {
-            var allMarket = _marketRepository.GetMarkets();
+            var allMarket = _marketRepository.GetMarkets(true);
             var requestDate = DateTime.Now;
             var tickerResult = await _binanceConnector.TickerAllPrices();
             var generatedPrice = GeneratedPrice(tickerResult, allMarket, requestDate);
@@ -102,7 +102,7 @@ namespace Scrooge.BusinessLogic.Implement.Common
                     if (allSymbols.Any(i => i == a.Name + a2.Name) && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id)
                         && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id) 
                         && !newMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id))
-                        newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a2.Id });
+                        newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a2.Id, IsActive = true });
 
             return newMarkets;
         }

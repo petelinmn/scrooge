@@ -12,7 +12,7 @@ namespace Scrooge.DataAccess.Common
         /// Get list of markets
         /// </summary>
         /// <returns></returns>
-        List<Market> GetMarkets();
+        List<Market> GetMarkets(bool onlyActive = true);
 
         /// <summary>
         /// Get list of markets
