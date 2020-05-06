@@ -8,21 +8,21 @@ using Scrooge.DataAccess.Common;
 using Scrooge.DataAccess.Models;
 using Scrooge.Exchange.Connectors.Models;
 using Scrooge.BusinessLogic.Common;
+using System.Threading;
 
 namespace Scrooge.BusinessLogic.Implement.Common
 {
     public class DataCommonService : IDataCommonService
     {
-        public async Task<bool> Collect()
+        public void Collect(DateTime requestDate)
         {
             var allMarket = _marketRepository.GetMarkets(true);
-            var requestDate = DateTime.Now;
-            var tickerResult = await _binanceConnector.TickerAllPrices();
+            IList<PriceInfo> tickerResult = null;
+            tickerResult = _binanceConnector.TickerAllPrices().Result;
             var generatedPrice = GeneratedPrice(tickerResult, allMarket, requestDate);
             var lastPrices = _priceRepository.GetLastPrices();
             var newPrices = GetNewPrice(generatedPrice, lastPrices);
             _priceRepository.Save(newPrices);
-            return false;
         }
 
         private static List<Price> GeneratedPrice(IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket, DateTime requestDate)

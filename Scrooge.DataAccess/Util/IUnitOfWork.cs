@@ -8,9 +8,7 @@ namespace Scrooge.DataAccess.Util
         /// <summary>
         /// open Connection and Transaction
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="transaction"></param>
-        void Begin(IDbConnection connection = null, IDbTransaction transaction = null);
+        void Begin();
 
         void Commit();
 

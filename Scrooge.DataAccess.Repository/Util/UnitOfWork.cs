@@ -11,30 +11,25 @@ namespace Scrooge.DataAccess.Repository.Util
         protected IConnectionProvider _connectionProvider;
         protected bool _disposed;
 
+        IDbConnection _connection = null;
+        IDbTransaction _transaction = null;
+
         public UnitOfWork(IConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
         }
 
-        public void Begin(IDbConnection connection = null, IDbTransaction transaction = null)
+        public void Begin()
         {
-            if (connection == null)
-            {
-                _connectionProvider.GetConnection();
-                _connectionProvider.OpenTransaction();
-            }
-            else
-            {
-                _connectionProvider.SetConnection(connection);
-                if (transaction == null)
-                {
-                    _connectionProvider.OpenTransaction();
-                }
-                else
-                {
-                    _connectionProvider.SetTransaction(transaction);
-                }
-            }
+            if (_connection == null)
+                _connection = _connectionProvider.GetConnection();
+
+            _connectionProvider.SetConnection(_connection);
+
+            if (_transaction == null)
+                _transaction = _connectionProvider.OpenTransaction();
+            
+            _connectionProvider.SetTransaction(_transaction);
         }
 
         public void Commit()
@@ -51,6 +46,7 @@ namespace Scrooge.DataAccess.Repository.Util
             finally
             {
                 _connectionProvider.CurrentTransaction.Dispose();
+                _transaction = null;
             }
         }
 

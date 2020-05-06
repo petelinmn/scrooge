@@ -8,19 +8,19 @@ namespace Scrooge.Task.MigrationsTasks.Tasks
     class MigrateTask : MigrateBaseTask
     {
         protected override void Execute()
-        {
-            Log.Information("Task started");
+        {            
             try
             {
+                Log.Information("Migrate task is started");
                 using var scope = ServiceProvider.CreateScope();
                 ServiceProvider.GetRequiredService<IMigrationRunner>().MigrateUp();
+                Log.Information("Migrate task was executed successful");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Log.Error(ex.Message);
+                Log.Error($"{e.Message}\n{e.StackTrace}");
                 return;
             }
-            Log.Information("Task was executed successful");
         }
     }
 }

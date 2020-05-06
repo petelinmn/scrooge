@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Scrooge.BusinessLogic.Common;
+using Scrooge.DataAccess.Util;
 using System;
 using System.Threading;
 
@@ -9,24 +10,52 @@ namespace Scrooge.Task.Tasks
     {
         protected override void Execute()
         {
-            var service = Container.GetService<IDataCommonService>();
-            using (var uow = GetUnitOfWork())
-            {
-                DateTime runDate; 
-                while (true)
+            try
+            {                
+                var service = Container.GetService<IDataCommonService>();
+                var checkEach = 10;
+                var delta = 5;
+                var lastSec = 1;
+
+                Log.Information("Collector task is started");
+                var uow = GetUnitOfWork();
                 {
-                    uow.Begin();
-                    runDate = DateTime.Now;
-                    var isAddedNewMarkets = service.Collect().Result;
+                    while (true)
+                    {
+                        var currentMoment = DateTime.UtcNow;
+                        if (currentMoment.Second != lastSec && currentMoment.Second % delta == 0)
+                        {
+                            lastSec = currentMoment.Second;
+                            Step(uow, service, currentMoment);
+                        }
 
-                    uow.Commit();
-
-                    if (isAddedNewMarkets)
-                        Log.Information("List of markets was updated");
-                    Thread.Sleep(5000 - (int)(DateTime.Now-runDate).TotalMilliseconds);
+                        Thread.Sleep(checkEach);
+                    }
                 }
-                
             }
+            catch (Exception e)
+            {
+                Log.Error($"{e.Message}\n{e.StackTrace}");
+            }
+        }
+
+        void Step(IUnitOfWork uow, IDataCommonService dataService, DateTime requestDate)
+        {
+            Console.WriteLine("Begin1");
+            uow.Begin();
+            Console.WriteLine("Begin2");
+            try
+            {
+                dataService.Collect(requestDate);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"{e.Message}\n{e.StackTrace}");
+                Thread.Sleep(1000);
+            }
+            Console.WriteLine("End1");
+            uow.Commit();
+            Console.WriteLine("End2");
         }
     }
 }
