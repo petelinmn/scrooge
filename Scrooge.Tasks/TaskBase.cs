@@ -47,7 +47,7 @@ namespace Scrooge.Task
         {
             var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Information()
-                .WriteTo.File(@$"logs\{this.GetType().Name}\{DateTime.Now.ToString("yyyy-MM-dd")}.log");
+                .WriteTo.File(@$"logs/{this.GetType().Name}/{DateTime.Now.ToString("yyyy-MM-dd")}.log");
 
             var isRequiredTelegramLogging = false;
             if (isRequiredTelegramLogging)
