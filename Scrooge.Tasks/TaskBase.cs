@@ -1,15 +1,19 @@
 ﻿using System;
 using System.IO;
+using Flurl;
+using Flurl.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scrooge.DataAccess.Repository.Util;
 using Scrooge.DataAccess.Util;
 using Scrooge.Infrastructure.Installers;
 using Serilog;
+using Serilog.Configuration;
 using Serilog.Core;
 
 using Serilog.Events;
 using TelegramSink;
+using TelegramSink.TelegramBotClient.Domain;
 
 namespace Scrooge.Task
 {
@@ -47,14 +51,23 @@ namespace Scrooge.Task
         {
             var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Information()
-                .WriteTo.File(@$"logs/{this.GetType().Name}/{DateTime.Now.ToString("yyyy-MM-dd")}.log");
+                .WriteTo.Async(l => l.File(@$"logs/{this.GetType().Name}/{DateTime.Now.ToString("yyyy-MM-dd")}.log"));
 
             var isRequiredTelegramLogging = false;
-            if (isRequiredTelegramLogging)
+            if (bool.TryParse(Configuration["Telegram:EnabledLogging"], out isRequiredTelegramLogging)
+                && isRequiredTelegramLogging)
             {
-                logConfiguration = logConfiguration.WriteTo.TeleSink(
-                    telegramApiKey: "my-bot-api-key",
-                    telegramChatId: "the target chat id");
+                var key = Configuration["Telegram:ApiKey"];
+                var chats = Configuration["Telegram:Chats"];
+                var chatIds = chats.Split(new char[] { ';' });
+                foreach(var chatId in chatIds)
+                {
+                    logConfiguration = logConfiguration
+                    .MinimumLevel.Information()
+                    .WriteTo.Async(l => l.TeleSink(
+                        telegramApiKey: key,
+                        telegramChatId: chatId));
+                }
             }
 
             Log = logConfiguration.CreateLogger();
@@ -84,3 +97,4 @@ namespace Scrooge.Task
         }
     }
 }
+
