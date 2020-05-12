@@ -51,7 +51,8 @@ namespace Scrooge.Task
         {
             var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Information()
-                .WriteTo.Async(l => l.File(@$"logs/{this.GetType().Name}/{DateTime.Now.ToString("yyyy-MM-dd")}.log"));
+                .WriteTo.Async(l => l.File(@$"logs/{this.GetType().Name}/{DateTime.Now.ToString("yyyy-MM-dd")}.log"))
+                .WriteTo.Async(l => l.Console());
 
             var isRequiredTelegramLogging = false;
             if (bool.TryParse(Configuration["Telegram:EnabledLogging"], out isRequiredTelegramLogging)
