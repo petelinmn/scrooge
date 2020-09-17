@@ -11,7 +11,7 @@ namespace Scrooge.BusinessLogic.Common
         /// First initialize collections of assets and markets
         /// </summary>
         /// <returns></returns>
-        Task<bool> MarketCollectionInitialize();
+        Task MarketCollectionInitialize();
         void Collect(DateTime requestDate);
     }
 }

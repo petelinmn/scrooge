@@ -6,16 +6,15 @@ namespace Scrooge.Infrastructure.Configuration
 {
     public class ConnectionStringProvider : IConnectionStringProvider
     {
+        IConfiguration Configuration { get; }
         public string GetDefaultConnectionString()
         {
-            return _configuration["ConnectionStrings:Default"];
+            return Configuration["ConnectionStrings:Default"];
         }
 
         public ConnectionStringProvider(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
-
-        private IConfiguration _configuration;
     }
 }

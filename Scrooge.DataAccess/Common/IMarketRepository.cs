@@ -12,18 +12,18 @@ namespace Scrooge.DataAccess.Common
         /// Get list of markets
         /// </summary>
         /// <returns></returns>
-        List<Market> GetMarkets(bool onlyActive = true);
+        IEnumerable<Market> GetMarkets(bool onlyActive = true);
 
         /// <summary>
         /// Get list of markets
         /// </summary>
         /// <returns></returns>
-        List<MarketInfo> GetMarketsInfo();
+        IEnumerable<MarketInfo> GetMarketsInfo();
 
         /// <summary>
         /// Save list of markets
         /// </summary>
-        /// <param name="assets"></param>
-        void Save(List<Market> markets);
+        /// <param name="markets"></param>
+        void Save(IReadOnlyCollection<Market> markets);
     }
 }

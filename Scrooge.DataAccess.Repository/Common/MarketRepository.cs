@@ -11,7 +11,8 @@ namespace Scrooge.DataAccess.Repository.Common
 {
     public class MarketRepository : BaseRepository, IMarketRepository
     {
-        public List<Market> GetMarkets(bool onlyActive = true)
+        IAssetRepository AssetRepository { get; }
+        public IEnumerable<Market> GetMarkets(bool onlyActive = true)
         {
             var result = Connection.Query<Market>($@"
                     select m.Id, concat(a1.Name, a2.Name) as Name, m.AssetId1, m.AssetId2, m.isactive 
@@ -25,15 +26,15 @@ namespace Scrooge.DataAccess.Repository.Common
             return result.ToList();
         }
 
-        public List<MarketInfo> GetMarketsInfo()
+        public IEnumerable<MarketInfo> GetMarketsInfo()
         {
             var markets = GetMarkets();
-            var assets = _assetRepository.GetAssets();
+            var assets = AssetRepository.GetAssets();
             var result = markets.Select(i => new MarketInfo { Id = i.Id, Asset1 = assets.First(a => a.Id == i.AssetId1), Asset2 = assets.First(a => a.Id == i.AssetId1), IsActive = i.IsActive});
             return result.ToList();
         }
 
-        public void Save(List<Market> markets)
+        public void Save(IReadOnlyCollection<Market> markets)
         {
             foreach (var market in markets)
             {
@@ -46,8 +47,7 @@ namespace Scrooge.DataAccess.Repository.Common
 
         public MarketRepository(IAssetRepository assetRepository, IConnectionProvider connectionProvider) : base(connectionProvider) 
         {
-            _assetRepository = assetRepository;
+            AssetRepository = assetRepository;
         }
-        IAssetRepository _assetRepository { get; set; }
     }
 }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Scrooge.Exchange.Connectors;
 using Scrooge.DataAccess.Common;
 using Scrooge.DataAccess.Models;
-using Scrooge.Exchange.Connectors.Models;
 using Scrooge.BusinessLogic.Common;
-using System.Threading;
 
 namespace Scrooge.BusinessLogic.Implement.Common
 {
@@ -16,63 +13,57 @@ namespace Scrooge.BusinessLogic.Implement.Common
     {
         public void Collect(DateTime requestDate)
         {
-            var allMarket = _marketRepository.GetMarkets(true);
-            IList<PriceInfo> tickerResult = null;
-            tickerResult = _binanceConnector.TickerAllPrices().Result;
-            var generatedPrice = GeneratedPrice(tickerResult, allMarket, requestDate);
-            var lastPrices = _priceRepository.GetLastPrices();
-            var newPrices = GetNewPrice(generatedPrice, lastPrices);
-            _priceRepository.Save(newPrices);
+            var allMarkets = MarketRepository.GetMarkets(true);
+            var allPrices = GetAllPrices(allMarkets, requestDate).ToList();
+            var newPrices = GetNewPrices(allPrices).ToList();
+
+            PriceRepository.Save(newPrices);
         }
 
-        private static List<Price> GeneratedPrice(IList<PriceInfo> tickerResult, IEnumerable<Market> allMarket, DateTime requestDate)
+        private IEnumerable<Price> GetAllPrices(IEnumerable<Market> allMarkets,
+            DateTime requestDate)
         {
-            List<Price> result = new List<Price>();
-            foreach (var a in allMarket)
-                foreach (var t in tickerResult)
-                    if (a.Name == t.Symbol)
-                        result.Add(new Price() { MarketId = a.Id, Value = t.Price, Date = requestDate });
-            return result;
+            var tickerResult = BinanceConnector.TickerAllPrices().Result;
+            return from market in allMarkets
+                from ticker in tickerResult
+                where market.Name == ticker.Symbol
+                select new Price() {MarketId = market.Id, Value = ticker.Price, Date = requestDate};
         }
 
-        private static List<Price> GetNewPrice(List<Price> generatedPrice, List<Price> lastPrices)
+        private IEnumerable<Price> GetNewPrices(IEnumerable<Price> allPrices)
         {
-
-            return generatedPrice
+            var lastPrices = PriceRepository.GetLastPrices().ToList();
+            return allPrices
                 .Where(i => (lastPrices
-                .Any(l => l.MarketId == i.MarketId && l.Value != i.Value)
-                ||(lastPrices.All(l=>l.MarketId!=i.MarketId)))).ToList();
+                                 .Any(l => l.MarketId == i.MarketId && l.Value != i.Value)
+                             || (lastPrices.All(l => l.MarketId != i.MarketId)))).ToList();
         }
+
         /// <summary>
         /// First initialize collections of assets and markets
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> MarketCollectionInitialize()
+        public async Task MarketCollectionInitialize()
         {
-            var tickerResult = await _binanceConnector.TickerAllPrices();
-            var allSymbols = tickerResult.Select(i => i.Symbol);
+            var tickerResult = await BinanceConnector.TickerAllPrices();
+            var allSymbols = tickerResult.Select(i => i.Symbol).ToList();
 
-            var allAssets = _assetRepository.GetAssets();
-            var newAssets = DefineNewAssets(allAssets, allSymbols);
-            _assetRepository.Save(newAssets);
-
-            allAssets = _assetRepository.GetAssets();
-            var allMarkets = _marketRepository.GetMarkets();
-            var newMarkets = DefineNewMarkets(allAssets, allMarkets, allSymbols);
-            _marketRepository.Save(newMarkets);
-
-            return false;
+            var newAssets = DefineNewAssets(allSymbols);
+            AssetRepository.Save(newAssets);
+            
+            var newMarkets = DefineNewMarkets(allSymbols);
+            MarketRepository.Save(newMarkets);
         }
 
         /// <summary> 
         /// Define new assets
         /// </summary>
-        /// <param name="assets">Existing assets</param>
-        /// <param name="tickerResult">set of markets from exchange</param>
+        /// <param name="allSymbols"></param>
         /// <returns></returns>
-        private static List<Asset> DefineNewAssets(IEnumerable<Asset> assets, IEnumerable<string> allSymbols)
+        private List<Asset> DefineNewAssets(IReadOnlyCollection<string> allSymbols)
         {
-            var primaryAssets = assets
+            var allAssets = AssetRepository.GetAssets();
+            var primaryAssets = allAssets
                 .Where(i => i.IsMain == true)
                 .ToDictionary(i => i, i => allSymbols
                     .Where(t => t.EndsWith(i.Name))
@@ -83,7 +74,7 @@ namespace Scrooge.BusinessLogic.Implement.Common
                      .Where(v => primaryAssets
                          .All(i2 => i2.Value
                              .Any(v2 => v2.Replace(i2.Key.Name, "") == v.Replace(i.Key.Name, ""))))
-                     .Where(v => !assets.Any(a => a.Name == v.Replace(i.Key.Name, "")))
+                     .Where(v => allAssets.All(a => a.Name == v.Replace(i.Key.Name, "")))
                      .Select(s => new Asset() { Name = s.Replace(i.Key.Name, ""), IsMain = false, IsStable = false }).ToList())
                 .FirstOrDefault().Value;
         }
@@ -91,34 +82,34 @@ namespace Scrooge.BusinessLogic.Implement.Common
         /// <summary>
         /// Define new markets
         /// </summary>
-        /// <param name="assets"></param>
         /// <param name="allSymbols"></param>
         /// <returns></returns>
-        private static List<Market> DefineNewMarkets (IEnumerable<Asset> assets, IEnumerable<Market> allMarkets, IEnumerable<string> allSymbols)
+        private List<Market> DefineNewMarkets (IReadOnlyCollection<string> allSymbols)
         {
-           List<Market> newMarkets = new List<Market>();
-           foreach (var a in assets)
-                foreach (var a2 in assets.Where(i => i.IsMain || (!i.IsMain && !a.IsMain)))
+           var allMarkets = MarketRepository.GetMarkets().ToList();
+           var allAssets = AssetRepository.GetAssets();
+           var newMarkets = new List<Market>();
+           foreach (var a in allAssets)
+                foreach (var a2 in allAssets.Where(i => i.IsMain || (!i.IsMain && !a.IsMain)))
                     if (allSymbols.Any(i => i == a.Name + a2.Name) && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id)
                         && !allMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id) 
                         && !newMarkets.Any(i => i.AssetId1 == a.Id && i.AssetId2 == a2.Id))
                         newMarkets.Add(new Market() { AssetId1 = a.Id, AssetId2 = a2.Id, IsActive = true });
 
-            return newMarkets;
+           return newMarkets;
         }
 
         public DataCommonService(IAssetRepository assetRepository, IMarketRepository marketRepository, IPriceRepository priceRepository, IConnector binanceConnector)
         {
-            _assetRepository = assetRepository;
-            _marketRepository = marketRepository;
-            _priceRepository = priceRepository;
-            _binanceConnector = binanceConnector;
+            AssetRepository = assetRepository;
+            MarketRepository = marketRepository;
+            PriceRepository = priceRepository;
+            BinanceConnector = binanceConnector;
         }
 
-        private readonly IAssetRepository _assetRepository;
-        private readonly IConnector _binanceConnector;
-        private readonly IMarketRepository _marketRepository;
-        private readonly IPriceRepository _priceRepository;
-
+        private IAssetRepository AssetRepository { get; }
+        private IConnector BinanceConnector { get; }
+        private IMarketRepository MarketRepository { get; }
+        private IPriceRepository PriceRepository { get; }
     }
 }

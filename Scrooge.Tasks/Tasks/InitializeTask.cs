@@ -14,7 +14,7 @@ namespace Scrooge.Task.Tasks
                 var service = Container.GetService<IDataCommonService>();
                 using (var uow = GetUnitOfWork())
                 {
-                    var isAddedNewMarkets = service.MarketCollectionInitialize().Result;
+                    service.MarketCollectionInitialize().Wait();
                     uow.Commit();
                 }
 
